@@ -13,12 +13,10 @@ namespace IntegrationTests;
 
 public class IntegrationTest : IClassFixture<CustomWebApplicationFactory<Program>>
 {
-    private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _client;
 
     public IntegrationTest(ITestOutputHelper testOutputHelper, CustomWebApplicationFactory<Program> factory)
     {
-        _testOutputHelper = testOutputHelper ?? throw new ArgumentNullException(nameof(testOutputHelper));
         _client = factory
             .WithWebHostBuilder(builder =>
             {
@@ -26,7 +24,7 @@ public class IntegrationTest : IClassFixture<CustomWebApplicationFactory<Program
                 {
                     loggingBuilder.ClearProviders();
                     loggingBuilder.SetMinimumLevel(LogLevel.Information);
-                    loggingBuilder.Services.AddSingleton<ILoggerProvider>(new XUnitLoggerProvider(_testOutputHelper));
+                    loggingBuilder.Services.AddSingleton<ILoggerProvider>(new XUnitLoggerProvider(testOutputHelper));
                 });
 
                 builder.ConfigureAppConfiguration(configurationBuilder =>
