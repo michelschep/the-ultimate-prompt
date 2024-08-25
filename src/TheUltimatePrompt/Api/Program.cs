@@ -40,3 +40,6 @@ app.UseAuthorization();
 app.MapControllers();
 var c = app.Services.GetService<IConfiguration>();
 app.Run();
+
+// To be able to create integration tests:
+public partial class Program {}
