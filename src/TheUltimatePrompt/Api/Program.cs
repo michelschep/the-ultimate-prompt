@@ -38,8 +38,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-var c = app.Services.GetService<IConfiguration>();
-app.Run();
+await app.RunAsync();
 
 // To be able to create integration tests:
 public partial class Program {}
