@@ -9,11 +9,29 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '8.x.x'
+
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetVersion)'
+  displayName: 'Use .NET 8 SDK'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: true
+  displayName: 'Restore NuGet packages'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    dotnet build --configuration $(buildConfiguration)
+  displayName: 'Build solution'
+
+- script: |
+    dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
+  displayName: 'Run tests'
