@@ -12,7 +12,10 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '8.0.x'
-
+  solution: '**/*.sln'
+  outputDir: '$(System.ArtifactsDirectory)/$(buildArtifactName)'
+  buildArtifactName: 'drop'
+  
 steps:
 - task: UseDotNet@2
   inputs:
@@ -29,8 +32,14 @@ steps:
   displayName: 'Restore NuGet packages'
 
 - script: |
-    dotnet build --configuration $(buildConfiguration)
+    dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
   displayName: 'Build solution'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(outputDir)'
+    ArtifactName: '$(buildArtifactName)'
+  displayName: 'Publish Build Artifacts'
 
 - script: |
     dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
