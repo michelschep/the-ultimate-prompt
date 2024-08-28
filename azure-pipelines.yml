@@ -28,7 +28,7 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
-    restoreSolution: true
+    restoreSolution: $(solution)
   displayName: 'Restore NuGet packages'
 
 - script: |
