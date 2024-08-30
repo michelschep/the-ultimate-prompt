@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '8.0.x'
+  solution: 'src/**/*.sln'
+  outputDir: '$(System.ArtifactsDirectory)/$(buildArtifactName)'
+  buildArtifactName: 'drop'
+  
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetVersion)'
+  displayName: 'Use .NET 8 SDK'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: $(solution)
+  displayName: 'Restore NuGet packages'
+
+- script: |
+    dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+  displayName: 'Build solution'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(outputDir)'
+    ArtifactName: '$(buildArtifactName)'
+  displayName: 'Publish Build Artifacts'
+
+- script: |
+    dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
+  displayName: 'Run tests'
