@@ -41,9 +41,9 @@ steps:
   displayName: 'Publish Build Artifacts'
 
 - script: |
-    dotnet test src/UnitTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+    dotnet test src/TheUltimatePrompt/UnitTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
   displayName: 'Run unit tests'
   
 - script: |
-    dotnet test src/IntegrationTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+    dotnet test src/TheUltimatePrompt/IntegrationTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
   displayName: 'Run integration tests'
