@@ -1,4 +1,7 @@
-# Starter pipeline with stages: Build, Test, Code Quality, Deploy
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
 trigger:
 - main
@@ -11,80 +14,36 @@ variables:
   dotnetVersion: '8.0.x'
   solution: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
   buildArtifactName: 'drop'
-  outputDir: '$(Build.ArtifactStagingDirectory)'
+  
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetVersion)'
+  displayName: 'Use .NET 8 SDK'
 
-stages:
-- stage: Build
-  jobs:
-  - job: Build
-    steps:
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '$(dotnetVersion)'
-      displayName: 'Use .NET 8 SDK'
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet'
 
-    - task: NuGetToolInstaller@1
-      displayName: 'Install NuGet'
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: $(solution)
+  displayName: 'Restore NuGet packages'
 
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: $(solution)
-      displayName: 'Restore NuGet packages'
+- script: |
+    dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+  displayName: 'Build solution'
 
-    - script: |
-        dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
-      displayName: 'Build solution'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.ArtifactsDirectory)'
+    ArtifactName: '$(buildArtifactName)'
+  displayName: 'Publish Build Artifacts'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(outputDir)'
-        ArtifactName: '$(buildArtifactName)'
-      displayName: 'Publish Build Artifacts'
-
-- stage: Test
-  jobs:
-  - job: UnitTest
-    steps:
-    - download: current
-      artifact: $(buildArtifactName)
-
-    - script: |
-        dotnet test src/UnitTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
-      displayName: 'Run unit tests'
-
-  - job: IntegrationTest
-    steps:
-    - download: current
-      artifact: $(buildArtifactName)
-
-    - script: |
-        dotnet test src/IntegrationTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
-      displayName: 'Run integration tests'
-
-- stage: CodeQuality
-  jobs:
-  - job: CodeQuality
-    steps:
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '$(dotnetVersion)'
-      displayName: 'Use .NET 8 SDK for Code Quality Analysis'
-
-    - script: |
-        # Add code quality tools like SonarQube or other analyzers here
-        echo "Code quality checks would be performed here."
-      displayName: 'Run Code Quality Analysis'
-
-- stage: Deploy
-  jobs:
-  - job: Deploy
-    steps:
-    - download: current
-      artifact: $(buildArtifactName)
-
-    - script: |
-        # Add your deployment script or command here
-        echo "Deployment script would be executed here."
-      displayName: 'Deploy Application'
+- script: |
+    dotnet test src/UnitTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+  displayName: 'Run unit tests'
+  
+- script: |
+    dotnet test src/IntegrationTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+  displayName: 'Run integration tests'
