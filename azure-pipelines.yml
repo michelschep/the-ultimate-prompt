@@ -38,20 +38,13 @@ steps:
     dotnet test src/TheUltimatePrompt/UnitTests/UnitTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --collect "Code coverage"
   displayName: 'Run unit tests'
 
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
 - script: |
     dotnet test src/TheUltimatePrompt/IntegrationTests/IntegrationTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
   displayName: 'Run integration tests'
   condition: 
-  
-- task: DotNetCoreCLI@2
-  inputs:
-    command: publish
-    publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: True
-
-# this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'myWebsite'  
+ 
