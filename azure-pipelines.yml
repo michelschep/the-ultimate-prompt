@@ -1,7 +1,5 @@
 # Starter pipeline with stages: Build, Test, Code Quality, Deploy
 
-name: $(BuildDefinitionName)_$(Date:yyyMMdd)_(Rev:.r)
-
 trigger:
 - main
 
