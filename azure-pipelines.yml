@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Starter pipeline with stages: Build, Test, Code Quality, Deploy
 
 trigger:
 - main
@@ -14,32 +11,71 @@ variables:
   dotnetVersion: '8.0.x'
   solution: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
   buildArtifactName: 'drop'
-  
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '$(dotnetVersion)'
-  displayName: 'Use .NET 8 SDK'
+  outputDir: '$(Build.ArtifactStagingDirectory)'
 
-- task: NuGetToolInstaller@1
-  displayName: 'Install NuGet'
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '$(dotnetVersion)'
+      displayName: 'Use .NET 8 SDK'
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: $(solution)
-  displayName: 'Restore NuGet packages'
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
 
-- script: |
-    dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
-  displayName: 'Build solution'
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: $(solution)
+      displayName: 'Restore NuGet packages'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(System.ArtifactsDirectory)'
-    ArtifactName: '$(buildArtifactName)'
-  displayName: 'Publish Build Artifacts'
+    - script: |
+        dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+      displayName: 'Build solution'
 
-- script: |
-    dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
-  displayName: 'Run tests'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(outputDir)'
+        ArtifactName: '$(buildArtifactName)'
+      displayName: 'Publish Build Artifacts'
+
+- stage: Test
+  jobs:
+  - job: Test
+    steps:
+    - download: current
+      artifact: $(buildArtifactName)
+
+    - script: |
+        dotnet test src/**/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+      displayName: 'Run tests'
+
+- stage: CodeQuality
+  jobs:
+  - job: CodeQuality
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '$(dotnetVersion)'
+      displayName: 'Use .NET 8 SDK for Code Quality Analysis'
+
+    - script: |
+        # Add code quality tools like SonarQube or other analyzers here
+        echo "Code quality checks would be performed here."
+      displayName: 'Run Code Quality Analysis'
+
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    steps:
+    - download: current
+      artifact: $(buildArtifactName)
+
+    - script: |
+        # Add your deployment script or command here
+        echo "Deployment script would be executed here."
+      displayName: 'Deploy Application'
