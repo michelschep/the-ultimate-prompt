@@ -34,11 +34,16 @@ steps:
     dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
   displayName: 'Build solution'
 
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: '**/$(BuildConfiguration)/**/?(*.exe|*.dll|*.pdb)'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+    
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(System.ArtifactsDirectory)'
-    ArtifactName: '$(buildArtifactName)'
-  displayName: 'Publish Build Artifacts'
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop
 
 - script: |
     dotnet test src/TheUltimatePrompt/UnitTests/UnitTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
