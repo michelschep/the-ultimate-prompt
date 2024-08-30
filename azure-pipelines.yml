@@ -44,14 +44,23 @@ stages:
 
 - stage: Test
   jobs:
-  - job: Test
+  - job: UnitTest
     steps:
     - download: current
       artifact: $(buildArtifactName)
 
     - script: |
-        dotnet test src/**/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
-      displayName: 'Run tests'
+        dotnet test src/UnitTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+      displayName: 'Run unit tests'
+
+  - job: IntegrationTest
+    steps:
+    - download: current
+      artifact: $(buildArtifactName)
+
+    - script: |
+        dotnet test src/IntegrationTests/*Test.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+      displayName: 'Run integration tests'
 
 - stage: CodeQuality
   jobs:
