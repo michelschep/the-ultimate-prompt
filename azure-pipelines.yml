@@ -13,7 +13,6 @@ variables:
   buildConfiguration: 'Release'
   dotnetVersion: '8.0.x'
   solution: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
-  outputDir: '$(System.ArtifactsDirectory)/drop'
   buildArtifactName: 'drop'
   
 steps:
@@ -37,7 +36,7 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(outputDir)'
+    PathtoPublish: '$(System.ArtifactsDirectory)'
     ArtifactName: '$(buildArtifactName)'
   displayName: 'Publish Build Artifacts'
 
