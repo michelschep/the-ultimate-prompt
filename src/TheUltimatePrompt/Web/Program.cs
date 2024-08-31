@@ -6,10 +6,14 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+var baseAddress = builder.Configuration["ApiBaseAddress"];
+if (baseAddress == null)
+{
+    throw new ArgumentException("Api address not found in appsettings.json");
+}
 builder.Services.AddScoped(_ => new HttpClient
 {
-    // TODO in dev config plaatsen
-    BaseAddress = new Uri("http://localhost:5064")
+    BaseAddress = new Uri(baseAddress)
 });
 
 await builder.Build().RunAsync();
