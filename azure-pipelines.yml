@@ -12,8 +12,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '8.0.x'
-  solution: 'src/**/*.sln'
-  outputDir: '$(System.ArtifactsDirectory)/$(buildArtifactName)'
+  solution: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
   buildArtifactName: 'drop'
   
 steps:
@@ -35,12 +34,15 @@ steps:
     dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
   displayName: 'Build solution'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(outputDir)'
-    ArtifactName: '$(buildArtifactName)'
-  displayName: 'Publish Build Artifacts'
+- script: |
+    dotnet test src/TheUltimatePrompt/UnitTests/UnitTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal  --logger trx --collect "Code coverage"
+  displayName: 'Run unit tests'
 
 - script: |
-    dotnet test --configuration $(buildConfiguration) --no-build --verbosity normal
-  displayName: 'Run tests'
+    dotnet test src/TheUltimatePrompt/IntegrationTests/IntegrationTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal --logger trx
+  displayName: 'Run integration tests'
+   
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
