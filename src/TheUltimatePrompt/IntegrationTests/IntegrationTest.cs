@@ -46,9 +46,5 @@ public class IntegrationTest : IClassFixture<CustomWebApplicationFactory<Program
         var result = await _client.GetFromJsonAsync<IList<WeatherForecast>>("WeatherForecast");
 
         result.Should().NotBeNull();
-        //result.Should().BeEquivalentTo(new WeatherForecast()
-        //{
-        //    Summary = "expected-name"
-        //});
     }
 }
