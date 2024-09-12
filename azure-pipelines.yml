@@ -10,12 +10,22 @@ pool:
   vmImage: windows-latest
 
 variables:
-  buildConfiguration: 'Release'
-  dotnetVersion: '8.0.x'
-  solution: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
-  buildArtifactName: 'drop'
-  
+  - group: my-variable-group
+  - name: 'buildConfiguration'
+    value: 'Release'
+  - name: 'dotnetVersion'
+    value: '8.0.x'
+  - name: 'solution' 
+    value: 'src/TheUltimatePrompt/TheUltimatePrompt.sln'
+  - name: 'buildArtifactName' 
+    value: 'drop'
+
+
 steps:
+- script: |
+    echo $(test-variable)
+  displayName: 'Show variables'
+
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
