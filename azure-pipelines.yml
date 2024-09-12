@@ -10,7 +10,7 @@ pool:
   vmImage: windows-latest
 
 variables:
-  - group: my-variable-group
+  - group: the-ultimate-prompt
   - name: 'buildConfiguration'
     value: 'Release'
   - name: 'dotnetVersion'
