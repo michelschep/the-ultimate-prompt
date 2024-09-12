@@ -20,7 +20,6 @@ variables:
   - name: 'buildArtifactName' 
     value: 'drop'
 
-
 steps:
 - script: |
     echo $(test-variable)
