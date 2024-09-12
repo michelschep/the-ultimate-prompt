@@ -1,1 +1,1 @@
-This project contains a tool to design the perfect prompt
+This project contains a tool to design the perfect prompt.
