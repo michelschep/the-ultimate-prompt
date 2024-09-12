@@ -20,6 +20,8 @@ variables:
   - name: 'buildArtifactName' 
     value: 'drop'
 
+name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:r)
+
 steps:
 - script: |
     echo $(test-variable)
